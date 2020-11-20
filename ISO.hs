@@ -1,10 +1,8 @@
 module ISO where
 
-import Control.Monad
-import Data.Tuple
-import Data.Void
-
-import Data.Char
+import Control.Monad ( liftM )
+import Data.Tuple ( swap )
+import Data.Void ( absurd, Void )
 
 type ISO a b = (a -> b, b -> a)
 
@@ -166,7 +164,7 @@ plusSO = isoPlus one refl `trans` plusS `trans` isoS plusO
 
 -- O * a = O
 multO :: ISO (Void, a) Void
-multO = (\(x, a) -> x, \x -> (x, absurd x))
+multO = (fst, \x -> (x, absurd x))
 
 -- S a * b = b + a * b
 multS :: ISO (Maybe a, b) (Either b (a, b))
@@ -190,12 +188,9 @@ multSO =
 powO :: ISO (Void -> a) ()
 powO = (const (), const absurd)
 
-tt :: (Maybe b -> a) -> (a, b -> a)
-tt f = (f Nothing, \b -> f $ Just b)
-
 -- a ^ (S b) = a * (a ^ b)
 powS :: ISO (Maybe b -> a) (a, b -> a)
-powS = (\fn -> (fn Nothing, \b -> fn $ Just b), g)
+powS = (\fn -> (fn Nothing, fn . Just), g)
   where
     g (x, y) = fn
       where
@@ -206,21 +201,4 @@ powS = (\fn -> (fn Nothing, \b -> fn $ Just b), g)
 -- Go the hard way (like multSO, plusSO)
 -- to prove that you really get what is going on!
 powSO :: ISO (() -> a) a
-powSO = (\f -> f (), \a -> const a)
-
-
-groupElems :: Eq a => [a] -> [[a]]
-groupElems xs = go xs [] []
-  where
-    go [] [] acc1 = reverse acc1
-    go [] acc0 acc1 = reverse (acc0 : acc1)
-    go (head : tail) [] acc1 = go tail (head : []) acc1
-    go (head : tail) (h : acc0t) acc1 | head == h = go tail (head : h : acc0t) acc1
-                                      | otherwise = go tail (head : []) ((h : acc0t) : acc1)
-
-foldWhile :: (b -> Bool) -> (b -> a -> b) -> b -> [a] -> b
-foldWhile p f z a = inn a z
-  where
-    inn [] acc = acc
-    inn (x : xs) acc = let new = (f acc x) in if (p new) then inn xs new else acc
-
+powSO = (\f -> f (), const)

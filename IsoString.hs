@@ -1,17 +1,19 @@
 module IsoString where
 
 import Data.Char (ord)
-import Data.Map (Map, insert)
-import qualified Data.Map as Map
+import Data.Map (insert)
+import qualified Data.Map as Map (empty,  lookup)
 
 isomorph :: String -> String -> Bool
-isomorph a b = length a == length b && (f (Map.empty :: Map Int Int) a b)&& (f (Map.empty :: Map Int Int) b a)
+isomorph a b = length a == length b && f Map.empty a b && f Map.empty b a
   where
-    f map [] [] = True
-    f map (x : xs) (y : ys) = let
+    f _ [] [] = True
+    f _ [] (_ : _) = False
+    f _ (_ : _) [] = False
+    f mp (x : xs) (y : ys) = let
         xo = ord x
         yo = ord y
       in
-        case Map.lookup xo map of
-          Just df -> if (df == xo - yo) then f map xs ys else False
-          Nothing -> f (Map.insert xo (xo - yo) map) xs ys
+        case Map.lookup xo mp of
+          Just df -> (df == xo - yo) && f mp xs ys
+          Nothing -> f (insert xo (xo - yo) mp) xs ys
