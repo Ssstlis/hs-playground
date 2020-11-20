@@ -20,6 +20,7 @@ simplify ex = case ex of
   Mul expx expy -> simplify (Mul (simplify expx) (simplify expy))
   expr -> expr
 
+-- for ghci
 instance Show Expr where
   show exp = case exp of
     Var str -> "Var(" ++ str ++ ")"
