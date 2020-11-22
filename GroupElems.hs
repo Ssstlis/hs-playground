@@ -7,4 +7,4 @@ groupElems xs = go xs [] []
     go [] acc0 acc1 = reverse (acc0 : acc1)
     go (head : tail) [] acc1 = go tail [head] acc1
     go (head : tail) (h : acc0t) acc1 | head == h = go tail (head : h : acc0t) acc1
-                                                          | otherwise = go tail [head] ((h : acc0t) : acc1)
+                                      | otherwise = go tail [head] ((h : acc0t) : acc1)
