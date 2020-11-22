@@ -6,18 +6,18 @@ data Expr = Var String -- переменная
           | Mul Expr Expr -- умножение
 
 simplify :: Expr -> Expr
-simplify ex = f ex
+simplify = f
   where
     f e = case e of
       Add x y -> onAdd x y
       Mul x y -> onMul x y
       expr -> expr
-    onAdd x y = case (simplify x, simplify y) of
+    onAdd a b = case (simplify a, simplify b) of
      (Const x, Const y) -> Const $ x + y
      (Const 0, y) -> y
      (x, Const 0) -> x
      (x, y) -> Add x y
-    onMul x y = case (simplify x, simplify y) of
+    onMul a b = case (simplify a, simplify b) of
       (Const x, Const y) -> Const $ x * y
       (Const 0, _) -> Const 0
       (_, Const 0) -> Const 0
