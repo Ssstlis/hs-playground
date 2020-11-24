@@ -23,3 +23,5 @@ cabal.project.local~
 .ghc.environment.*
 .idea
 *.sc
+.metals
+.vscode
