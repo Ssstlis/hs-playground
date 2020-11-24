@@ -1,5 +1,8 @@
 module Expr where
 
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 data Expr = Var String -- переменная
           | Const Integer -- целочисленная константа
           | Add Expr Expr -- сложение
@@ -25,7 +28,12 @@ simplify = f
       (x, Const 1) -> x
       (x, y) -> Mul x y
 
-
+evaluate :: Map String Integer -> Expr -> Integer
+evaluate vars expr = case simplify expr of
+  Const x -> x
+  Var x -> vars Map.! x
+  Add x y -> evaluate vars x + evaluate vars y
+  Mul x y -> evaluate vars x * evaluate vars y
 
 -- for ghci
 instance Show Expr where
@@ -35,8 +43,8 @@ instance Show Expr where
     Add expx expy -> "Add(" ++ show expx ++ ", " ++ show expy ++ ")"
     Mul expx expy -> "Mul(" ++ show expx ++ ", " ++ show expy ++ ")"
 
-tests = 
-  map simplify [
+testsbase f = 
+  map f [
     Var "x"
     , Const 5
     , Add (Const 5) (Const 5)
@@ -55,3 +63,6 @@ tests =
     , Mul (Var "x") (Add (Const 1) (Const (-1)))
     , Mul (Var "x") (Add (Const 1) (Const (0)))
   ]
+
+tests = testsbase simplify
+testsE map = testsbase $ evaluate map
