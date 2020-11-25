@@ -43,6 +43,7 @@ instance Show Expr where
     Add expx expy -> "Add(" ++ show expx ++ ", " ++ show expy ++ ")"
     Mul expx expy -> "Mul(" ++ show expx ++ ", " ++ show expy ++ ")"
 
+testsbase :: (Expr -> b) -> [b]
 testsbase f = 
   map f [
     Var "x"
@@ -61,8 +62,11 @@ testsbase f =
     , Mul (Mul (Mul (Mul (Const 1) (Const 2)) (Const 1)) (Const 1)) (Const 1)
     , Add (Var "x") (Add (Const 1) (Const (-1)))
     , Mul (Var "x") (Add (Const 1) (Const (-1)))
-    , Mul (Var "x") (Add (Const 1) (Const (0)))
+    , Mul (Var "x") (Add (Const 1) (Const 0))
   ]
 
+tests :: [Expr]
 tests = testsbase simplify
-testsE map = testsbase $ evaluate map
+
+testsE :: Map String Integer -> [Integer]
+testsE = testsbase . evaluate
